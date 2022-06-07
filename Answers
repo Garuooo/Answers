@@ -1,0 +1,174 @@
+//question 1 
+var calculate = function(input) {
+    input = "("+input+")";
+    const stack = [];
+    for(let i of input){
+        if(i !== ")"){
+            if(i === " ")
+                continue;
+            stack.push(i); 
+        }else{
+            let number = "";
+            let result = 0;
+            while(stack[stack.length-1] !== "(" && stack.length){
+                while((stack[stack.length-1] !== "+" && stack[stack.length-1] !== "-") && stack[stack.length-1] !== "(" && stack.length){
+                    number = stack.pop() + number;
+                }
+                number = parseInt(number);
+                if(stack.length && stack[stack.length-1] !== "("){
+                    const sign = stack.pop();
+                    if(sign === "-")
+                        number = -number; 
+                }
+                result += number;
+                number = "";
+            }
+             if(stack.length){
+                stack.pop();
+             }
+             stack.push(result);
+        }
+    }
+    return stack.pop();
+};
+
+
+
+//question 2
+var maxStudents = function (seats) {
+	const memo = {},
+		m = seats[0].length,
+		getRowPossibilities = (prevRow, curRow) => {
+			const allPossibilities = { [-1]: [""] };
+			for (let i = 0; i < m; i++) {
+				allPossibilities[i] = [];
+				allPossibilities[i - 1].forEach(possibility => {
+					//dont place a student
+					allPossibilities[i].push(possibility + curRow[i]);
+					//if possible, place a student
+					curRow[i] === "." &&
+						prevRow[i - 1] !== "1" &&
+						prevRow[i + 1] !== "1" &&
+						possibility[i - 1] !== "1" &&
+						allPossibilities[i].push(possibility + "1");
+				});
+			}
+			return allPossibilities[m - 1];
+		},
+		place = (prevRow, curRowIndex) => {
+			if (curRowIndex === seats.length) return 0;
+			const key = prevRow + curRowIndex;
+			if (memo[key]) return memo[key];
+			let max = 0;
+			getRowPossibilities(prevRow, seats[curRowIndex]).forEach(pos => {
+				max = Math.max(
+					max,
+					place(pos, curRowIndex + 1) + pos.split("1").length - 1
+				);
+			});
+			memo[key] = max;
+			return max;
+		};
+	return place("", 0);
+};
+
+
+//question 3
+
+var isMatch = function(s, p) {
+    let lp = ''
+    let pat = ''
+    for(let a of p){
+        if(lp==='*' && a==='*') continue
+        lp = a
+        pat += a
+    }
+    p = pat
+    const dp = Array(s.length+1).fill(0).map(()=>Array(p.length+1).fill(false))
+    dp[0][0] = true
+    if(p[0]==='*'){
+        dp[0][1]=true
+    }
+    for(let si=1; si<=s.length; si++){
+        for(let pi=1; pi<=p.length; pi++){
+            const cs = s[si-1]
+            const cp = p[pi-1]
+            if(cs===cp || cp==='?') dp[si][pi] = dp[si-1][pi-1];
+            if(cp==='*') dp[si][pi] = dp[si-1][pi] || dp[si][pi-1];
+        }
+    }
+    return dp[s.length][p.length]    
+};
+
+
+
+
+//question 4
+function gcd(a, b)
+{
+	
+	// Everything divides 0
+	if (a == 0)
+		return b;
+	if (b == 0)
+		return a;
+	
+	// base case
+	if (a == b)
+		return a;
+	
+	// a is greater
+	if (a > b)
+		return gcd(a - b, b);
+		
+	return gcd(a, b - a);
+}
+
+// Function to calculate the required LCM sum
+function lcmSum(n)
+{
+	var sum = 0;
+
+	for(var i = 1; i <= n; i++)
+	{
+
+		// GCD of i and n
+		var _gcd = gcd(i, n);
+
+		// LCM of i and n i.e. (i * n) / gcd(i, n)
+		var lcm = (i * n) / _gcd;
+
+		// Update sum
+		sum = sum + lcm;
+	}
+	return sum;
+}
+
+
+//question 5
+
+function getSum(n)
+{
+	let sum = 0;
+	while (n != 0) {
+		sum = sum + n % 10;
+		n = Math.floor(n / 10);
+	}
+	return sum;
+}
+
+// Function to find the smallest
+// number whose sum of digits is also N
+function smallestNumber(N)
+{
+	let i = 1;
+	while (1) {
+		// Checking if number has
+		// sum of digits = N
+		if (getSum(i) == N) {
+			console.log(i)
+			break;
+		}
+		i++;
+	}
+}
